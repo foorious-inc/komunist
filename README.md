@@ -2,6 +2,30 @@
 
 API for Italian locations focusing on Eurostat codes (NUTS, etc.).
 
+## Endpoints
+
+First of all, you need to pass a GET parameter called "access_token", with the value of "BN78FGH". This is just so if the API ever gets abused we can change it to disable access.
+
+### GET /provinces
+
+Returns every province in Italy.
+
+Example;
+
+```
+http://locations-api.progettieducativi.it/api/v1/provinces?access_token=BN78FGH
+```
+
+### GET /cities
+
+Returns every city in Italy.
+
+Example;
+
+```
+http://locations-api.progettieducativi.it/api/v1/cities?access_token=BN78FGH
+```
+
 ## Run locally
 
 You can quickly run a server without a database in the current directory with:
