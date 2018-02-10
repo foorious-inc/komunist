@@ -75,7 +75,7 @@ try {
             'id' => $fields[22] . '-' . $fields[18],
             'name' => $fields[5] . ($fields[6] ? '/' . $fields[6] : ''),
 
-            'nuts3_2010_code' => $fields[22],
+            'nuts_2010_code' => $fields[22],
             'cad_code' => $fields[18],
             'license_plate_code' =>$fields[13],
 
@@ -84,22 +84,139 @@ try {
         ];
     }
 
-    function handle_route($_CACHE, $route_name, $data_key) {
+    function handle_route($_CACHE, $data_type) {
         $data = [];
     
-        switch ($route_name) {
-            case 'cities':
-                foreach ($_CACHE as $city_data) {
-                    $data[] = $city_data;
-                }            
-                break;            
+        switch ($data_type) {
+            // case 'zones':
+            //     // ITC NORD-OVEST
+            //     // ITH NORD-EST
+            //     // ITI CENTRO            
+            //     // ITF SUD
+            //     // ITG ISOLE
+            //     // ITZ EXTRA-REGIO            
+            //     break;
+            case 'regions':
+                $data = [
+                    [
+                        'id' => 'ITC1',
+                        'name' => 'Piemonte',
+                        'nuts_2010_code' => ''
+                    ],
+                    [
+                        'id' => 'ITC2',
+                        'name' => 'Valle d’Aosta/Vallée d’Aoste',
+                        'nuts_2010_code' => 'ITC2'
+                    ],
+                    [
+                        'id' => 'ITC3',
+                        'name' => 'Liguria',
+                        'nuts_2010_code' => 'ITC3'
+                    ],                                        
+                    [
+                        'id' => 'ITC4',
+                        'name' => 'Lombardia',
+                        'nuts_2010_code' => 'ITC4'
+                    ],
+                    [
+                        'id' => 'ITF1',
+                        'name' => 'Abruzzo',
+                        'nuts_2010_code' => 'ITF1'
+                    ],
+                    [
+                        'id' => 'ITF2',
+                        'name' => 'Molise',
+                        'nuts_2010_code' => 'ITF2'
+                    ],                                        
+                    [
+                        'id' => 'ITF3',
+                        'name' => 'Campania',
+                        'nuts_2010_code' => 'ITF3'
+                    ],
+                    [
+                        'id' => 'ITF4',
+                        'name' => 'Puglia',
+                        'nuts_2010_code' => 'ITF4'
+                    ],
+                    [
+                        'id' => 'ITF5',
+                        'name' => 'Basilicata',
+                        'nuts_2010_code' => 'ITF5'
+                    ],                                        
+                    [
+                        'id' => 'ITF6',
+                        'name' => 'Calabria',
+                        'nuts_2010_code' => 'ITF6'
+                    ],
+                    [
+                        'id' => 'ITG1',
+                        'name' => 'Sicilia',
+                        'nuts_2010_code' => 'ITG1'
+                    ],
+                    [
+                        'id' => 'ITG2',
+                        'name' => 'Sardegna',
+                        'nuts_2010_code' => 'ITG2'
+                    ],                                        
+                    [
+                        'id' => 'ITH1',
+                        'name' => 'Provincia Autonoma di Bolzano/Bozen',
+                        'nuts_2010_code' => 'ITH1'
+                    ],
+                    [
+                        'id' => 'ITH2',
+                        'name' => 'Provincia Autonoma di Trento',
+                        'nuts_2010_code' => 'ITH2'
+                    ],
+                    [
+                        'id' => 'ITH3',
+                        'name' => 'Veneto',
+                        'nuts_2010_code' => 'ITH3'
+                    ],                                        
+                    [
+                        'id' => 'ITH4',
+                        'name' => 'Friuli-Venezia Giulia',
+                        'nuts_2010_code' => 'ITH4'
+                    ],
+                    [
+                        'id' => 'ITH5',
+                        'name' => 'Emilia-Romagna',
+                        'nuts_2010_code' => 'ITH5'
+                    ],
+                    [
+                        'id' => 'ITI1',
+                        'name' => 'Toscana',
+                        'nuts_2010_code' => 'ITI1'
+                    ],                                        
+                    [
+                        'id' => 'ITI2',
+                        'name' => 'Umbria',
+                        'nuts_2010_code' => 'ITI2'
+                    ],
+                    [
+                        'id' => 'ITI3',
+                        'name' => 'Marche',
+                        'nuts_2010_code' => 'ITI3'
+                    ],
+                    [
+                        'id' => 'ITI4',
+                        'name' => 'Lazio',
+                        'nuts_2010_code' => 'ITI4'
+                    ]
+                ];
+                break;
             case 'provinces':
                 foreach ($_CACHE as $city_data) {
                     if ($city_data['is_province']) {
                         $data[] = $city_data;
                     }
                 }            
-                break;
+                break;                
+            case 'cities':
+                foreach ($_CACHE as $city_data) {
+                    $data[] = $city_data;
+                }            
+                break;            
             default:   
                 throw new \Exception('cannot handle route');
         }
@@ -110,17 +227,22 @@ try {
 
         return response(json_encode([
             'count' => count($data),
-            $data_key => $data
+            $data_type => $data
         ]), 200, ['content-type' => 'application/json']);
     }
 
     // set routes
-    route('GET', '/api/v1/cities', function($_CACHE) {
-        return handle_route($_CACHE, 'cities', 'cities');
-    });
-    route('GET', '/api/v1/provinces', function($_CACHE) {
-        return handle_route($_CACHE, 'provinces', 'provinces');
+    route('GET', '/api/v1/regions', function($_CACHE) {
+        return handle_route($_CACHE, 'regions');
     });    
+    route('GET', '/api/v1/provinces', function($_CACHE) {
+        return handle_route($_CACHE, 'provinces');
+    });     
+    route('GET', '/api/v1/cities', function($_CACHE) {
+        return handle_route($_CACHE, 'cities');
+    });
+   
+
     dispatch($_CACHE, null);
 } catch (Exception $e) {
     http_response_code(400);
