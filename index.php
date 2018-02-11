@@ -84,7 +84,7 @@ try {
         ];
     }
 
-    function handle_route($_CACHE, $data_type) {
+    function get_data($_CACHE, $data_type) {
         $data = [];
     
         switch ($data_type) {
@@ -96,6 +96,28 @@ try {
             //     // ITG ISOLE
             //     // ITZ EXTRA-REGIO            
             //     break;
+            case 'locations':
+                $regions = get_data($_CACHE, 'regions');
+                foreach ($regions as $region) {
+                    $region['type'] = 'region';
+
+                    $data[] = $region;
+                }
+
+                $provinces = get_data($_CACHE, 'provinces');
+                foreach ($provinces as $province) {
+                    $province['type'] = 'province';
+
+                    $data[] = $province;
+                }
+
+                $cities = get_data($_CACHE, 'cities');
+                foreach ($cities as $city) {
+                    $city['type'] = 'city';
+
+                    $data[] = $city;
+                }                
+                break;
             case 'regions':
                 $data = [
                     [
@@ -225,21 +247,41 @@ try {
             return strcmp($a['name'], $b['name']);
         });
 
-        return response(json_encode([
-            'count' => count($data),
-            $data_type => $data
-        ]), 200, ['content-type' => 'application/json']);
+        return $data;
     }
 
     // set routes
+    route('GET', '/api/v1/locations', function($_CACHE) {
+        $data = get_data($_CACHE, 'locations');
+
+        return response(json_encode([
+            'count' => count($data),
+            'locations' => $data
+        ]), 200, ['content-type' => 'application/json']);
+    });        
     route('GET', '/api/v1/regions', function($_CACHE) {
-        return handle_route($_CACHE, 'regions');
+        $data = get_data($_CACHE, 'regions');
+
+        return response(json_encode([
+            'count' => count($data),
+            'regions' => $data
+        ]), 200, ['content-type' => 'application/json']);
     });    
     route('GET', '/api/v1/provinces', function($_CACHE) {
-        return handle_route($_CACHE, 'provinces');
+        $data = get_data($_CACHE, 'provinces');
+
+        return response(json_encode([
+            'count' => count($data),
+            'provinces' => $data
+        ]), 200, ['content-type' => 'application/json']);
     });     
     route('GET', '/api/v1/cities', function($_CACHE) {
-        return handle_route($_CACHE, 'cities');
+        $data = get_data($_CACHE, 'cities');
+        
+        return response(json_encode([
+            'count' => count($data),
+            'cities' => $data
+        ]), 200, ['content-type' => 'application/json']);
     });
    
 
