@@ -13,7 +13,7 @@ Returns every province in Italy.
 Example;
 
 ```
-http://locations-api.progettieducativi.it/api/v1/provinces?access_token=BN78FGH
+http://locations-api.dev.progettieducativi.it/api/v1/provinces?access_token=BN78FGH
 ```
 
 ### GET /cities
@@ -23,7 +23,7 @@ Returns every city in Italy.
 Example;
 
 ```
-http://locations-api.progettieducativi.it/api/v1/cities?access_token=BN78FGH
+http://locations-api.dev.progettieducativi.it/api/v1/cities?access_token=BN78FGH
 ```
 
 ## Run locally
