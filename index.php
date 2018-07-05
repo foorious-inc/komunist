@@ -99,130 +99,136 @@ try {
             //     break;
             case 'locations':
                 $regions = get_data($_CACHE, 'regions', $options);
-                foreach ($regions as $location) {
-                    $location['type'] = 'region';
-
-                    $data[] = $location;
-                }
-
                 $provinces = get_data($_CACHE, 'provinces', $options);
-                foreach ($provinces as $location) {
-                    $location['type'] = 'province';
-
-                    $data[] = $location;
-                }
-
                 $cities = get_data($_CACHE, 'cities', $options);
-                foreach ($cities as $location) {
-                    $location['type'] = 'city';
 
-                    $data[] = $location;
-                }                
+                $data = array_merge($regions, $provinces, $cities);
                 break;
             case 'regions':
                 $data = [
                     [
                         'id' => 'ITC1',
+                        'type' => 'region',
                         'name' => 'Piemonte',
                         'nuts_2010_code' => ''
                     ],
                     [
                         'id' => 'ITC2',
+                        'type' => 'region',
                         'name' => 'Valle d’Aosta/Vallée d’Aoste',
                         'nuts_2010_code' => 'ITC2'
                     ],
                     [
                         'id' => 'ITC3',
+                        'type' => 'region',
                         'name' => 'Liguria',
                         'nuts_2010_code' => 'ITC3'
                     ],                                        
                     [
                         'id' => 'ITC4',
+                        'type' => 'region',
                         'name' => 'Lombardia',
                         'nuts_2010_code' => 'ITC4'
                     ],
                     [
                         'id' => 'ITF1',
+                        'type' => 'region',
                         'name' => 'Abruzzo',
                         'nuts_2010_code' => 'ITF1'
                     ],
                     [
                         'id' => 'ITF2',
+                        'type' => 'region',
                         'name' => 'Molise',
                         'nuts_2010_code' => 'ITF2'
                     ],                                        
                     [
                         'id' => 'ITF3',
+                        'type' => 'region',
                         'name' => 'Campania',
                         'nuts_2010_code' => 'ITF3'
                     ],
                     [
                         'id' => 'ITF4',
+                        'type' => 'region',
                         'name' => 'Puglia',
                         'nuts_2010_code' => 'ITF4'
                     ],
                     [
                         'id' => 'ITF5',
+                        'type' => 'region',
                         'name' => 'Basilicata',
                         'nuts_2010_code' => 'ITF5'
                     ],                                        
                     [
                         'id' => 'ITF6',
+                        'type' => 'region',
                         'name' => 'Calabria',
                         'nuts_2010_code' => 'ITF6'
                     ],
                     [
                         'id' => 'ITG1',
+                        'type' => 'region',
                         'name' => 'Sicilia',
                         'nuts_2010_code' => 'ITG1'
                     ],
                     [
                         'id' => 'ITG2',
+                        'type' => 'region',
                         'name' => 'Sardegna',
                         'nuts_2010_code' => 'ITG2'
                     ],                                        
                     [
                         'id' => 'ITH1',
+                        'type' => 'region',
                         'name' => 'Provincia Autonoma di Bolzano/Bozen',
                         'nuts_2010_code' => 'ITH1'
                     ],
                     [
                         'id' => 'ITH2',
+                        'type' => 'region',
                         'name' => 'Provincia Autonoma di Trento',
                         'nuts_2010_code' => 'ITH2'
                     ],
                     [
                         'id' => 'ITH3',
+                        'type' => 'region',
                         'name' => 'Veneto',
                         'nuts_2010_code' => 'ITH3'
                     ],                                        
                     [
                         'id' => 'ITH4',
+                        'type' => 'region',
                         'name' => 'Friuli-Venezia Giulia',
                         'nuts_2010_code' => 'ITH4'
                     ],
                     [
                         'id' => 'ITH5',
+                        'type' => 'region',
                         'name' => 'Emilia-Romagna',
                         'nuts_2010_code' => 'ITH5'
                     ],
                     [
                         'id' => 'ITI1',
+                        'type' => 'region',
                         'name' => 'Toscana',
                         'nuts_2010_code' => 'ITI1'
                     ],                                        
                     [
                         'id' => 'ITI2',
+                        'type' => 'region',
                         'name' => 'Umbria',
                         'nuts_2010_code' => 'ITI2'
                     ],
                     [
                         'id' => 'ITI3',
+                        'type' => 'region',
                         'name' => 'Marche',
                         'nuts_2010_code' => 'ITI3'
                     ],
                     [
                         'id' => 'ITI4',
+                        'type' => 'region',
                         'name' => 'Lazio',
                         'nuts_2010_code' => 'ITI4'
                     ]
@@ -231,12 +237,14 @@ try {
             case 'provinces':
                 foreach ($_CACHE as $city_data) {
                     if ($city_data['is_province']) {
+                        $city_data['type'] = 'province';
                         $data[] = $city_data;
                     }
                 }            
                 break;                
             case 'cities':
                 foreach ($_CACHE as $city_data) {
+                    $city_data['type'] = 'city';
                     $data[] = $city_data;
                 }            
                 break;            
@@ -277,55 +285,42 @@ try {
     }
 
     // set routes
-    route('GET', '/api/v1/italy/locations', function($_CACHE) {
-        $data = get_data($_CACHE, 'locations', [
-            'country' => 'IT',
-            'region' => isset($_GET['region']) ? $_GET['region'] : '',
-            'province' => isset($_GET['province']) ? $_GET['province'] : ''
-        ]);
+    route('GET', '/api/v1/locations', function($_CACHE) {
+        switch ($_GET['type']) {
+            case 'region':
+                $data = get_data($_CACHE, 'regions', [
+                    'country' => 'IT',
+                    'region' => isset($_GET['region']) ? $_GET['region'] : '',
+                    'province' => isset($_GET['province']) ? $_GET['province'] : ''
+                ]);
+                break;
+            case 'province':
+                $data = get_data($_CACHE, 'provinces', [
+                    'country' => 'IT',
+                    'region' => isset($_GET['region']) ? $_GET['region'] : '',
+                    'province' => isset($_GET['province']) ? $_GET['province'] : ''
+                ]);
+                break;
+            case 'city':
+                $data = get_data($_CACHE, 'cities', [
+                    'country' => 'IT',
+                    'region' => isset($_GET['region']) ? $_GET['region'] : '',
+                    'province' => isset($_GET['province']) ? $_GET['province'] : ''
+                ]);
+                break;
+            default:
+                $data = get_data($_CACHE, 'locations', [
+                    'country' => 'IT',
+                    'region' => isset($_GET['region']) ? $_GET['region'] : '',
+                    'province' => isset($_GET['province']) ? $_GET['province'] : ''
+                ]);
+        }
 
         return response(json_encode([
             'count' => count($data),
             'locations' => $data
         ]), 200, ['content-type' => 'application/json']);
     });        
-    route('GET', '/api/v1/italy/regions', function($_CACHE) {
-        $data = get_data($_CACHE, 'regions', [
-            'country' => 'IT',
-            'region' => isset($_GET['region']) ? $_GET['region'] : '',
-            'province' => isset($_GET['province']) ? $_GET['province'] : ''
-        ]);
-
-        return response(json_encode([
-            'count' => count($data),
-            'regions' => $data
-        ]), 200, ['content-type' => 'application/json']);
-    });    
-    route('GET', '/api/v1/italy/provinces', function($_CACHE) {
-        $data = get_data($_CACHE, 'provinces', [
-            'country' => 'IT',
-            'region' => isset($_GET['region']) ? $_GET['region'] : '',
-            'province' => isset($_GET['province']) ? $_GET['province'] : ''
-        ]);
-
-        return response(json_encode([
-            'count' => count($data),
-            'provinces' => $data
-        ]), 200, ['content-type' => 'application/json']);
-    });     
-    route('GET', '/api/v1/italy/cities', function($_CACHE) {
-        $data = get_data($_CACHE, 'cities', [
-            'country' => 'IT',
-            'region' => isset($_GET['region']) ? $_GET['region'] : '',
-            'province' => isset($_GET['province']) ? $_GET['province'] : ''
-        ]);
-        
-        return response(json_encode([
-            'count' => count($data),
-            'cities' => $data
-        ]), 200, ['content-type' => 'application/json']);
-    });
-   
 
     dispatch($_CACHE, null);
 } catch (Exception $e) {
