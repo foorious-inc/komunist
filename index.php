@@ -71,8 +71,9 @@ try {
 
         $is_province = (bool) $fields[12];
         $population = (int) str_replace(',', '', $fields[19]);
-        $_CACHE[] = [
-            'id' => $fields[22] . '-' . $fields[18],
+        $location_id = $fields[22] . '-' . $fields[18];
+        $_CACHE[$location_id] = [
+            'id' => $location_id,
             'name' => $fields[5] . ($fields[6] ? '/' . $fields[6] : ''),
 
             'nuts_2010_code' => $fields[22],
@@ -84,7 +85,7 @@ try {
         ];
     }
 
-    function get_data($_CACHE, $data_type) {
+    function get_data($_CACHE, $data_type, $options=[]) {
         $data = [];
     
         switch ($data_type) {
@@ -97,25 +98,25 @@ try {
             //     // ITZ EXTRA-REGIO            
             //     break;
             case 'locations':
-                $regions = get_data($_CACHE, 'regions');
-                foreach ($regions as $region) {
-                    $region['type'] = 'region';
+                $regions = get_data($_CACHE, 'regions', $options);
+                foreach ($regions as $location) {
+                    $location['type'] = 'region';
 
-                    $data[] = $region;
+                    $data[] = $location;
                 }
 
-                $provinces = get_data($_CACHE, 'provinces');
-                foreach ($provinces as $province) {
-                    $province['type'] = 'province';
+                $provinces = get_data($_CACHE, 'provinces', $options);
+                foreach ($provinces as $location) {
+                    $location['type'] = 'province';
 
-                    $data[] = $province;
+                    $data[] = $location;
                 }
 
-                $cities = get_data($_CACHE, 'cities');
-                foreach ($cities as $city) {
-                    $city['type'] = 'city';
+                $cities = get_data($_CACHE, 'cities', $options);
+                foreach ($cities as $location) {
+                    $location['type'] = 'city';
 
-                    $data[] = $city;
+                    $data[] = $location;
                 }                
                 break;
             case 'regions':
@@ -243,6 +244,31 @@ try {
                 throw new \Exception('cannot handle route');
         }
 
+        // transform in ID-based array
+        $data_tmp = [];
+        foreach ($data as $k=>$v) {
+            if (!$data[$k]['id']) {
+                throw new Exception('location does not have ID');
+            }
+
+            $data_tmp[$data[$k]['id']] = $v;
+        }
+        $data = $data_tmp;
+
+        // filter data
+        if (is_array($options) && count($options)) {
+            foreach ($data as $location_id=>$location) {
+                foreach (['country', 'region', 'province'] as $option_name) {
+                    if (isset($options[$option_name]) && $options[$option_name]) {
+                        if (strpos(strtoupper($location['nuts_2010_code']), strtoupper($options[$option_name])) !== 0) {
+                            unset($data[$location_id]);
+                        }
+                    }
+                }
+            }
+        }
+
+        // sort data
         usort($data, function($a, $b) {
             return strcmp($a['name'], $b['name']);
         });
@@ -251,32 +277,48 @@ try {
     }
 
     // set routes
-    route('GET', '/api/v1/locations', function($_CACHE) {
-        $data = get_data($_CACHE, 'locations');
+    route('GET', '/api/v1/italy/locations', function($_CACHE) {
+        $data = get_data($_CACHE, 'locations', [
+            'country' => 'IT',
+            'region' => isset($_GET['region']) ? $_GET['region'] : '',
+            'province' => isset($_GET['province']) ? $_GET['province'] : ''
+        ]);
 
         return response(json_encode([
             'count' => count($data),
             'locations' => $data
         ]), 200, ['content-type' => 'application/json']);
     });        
-    route('GET', '/api/v1/regions', function($_CACHE) {
-        $data = get_data($_CACHE, 'regions');
+    route('GET', '/api/v1/italy/regions', function($_CACHE) {
+        $data = get_data($_CACHE, 'regions', [
+            'country' => 'IT',
+            'region' => isset($_GET['region']) ? $_GET['region'] : '',
+            'province' => isset($_GET['province']) ? $_GET['province'] : ''
+        ]);
 
         return response(json_encode([
             'count' => count($data),
             'regions' => $data
         ]), 200, ['content-type' => 'application/json']);
     });    
-    route('GET', '/api/v1/provinces', function($_CACHE) {
-        $data = get_data($_CACHE, 'provinces');
+    route('GET', '/api/v1/italy/provinces', function($_CACHE) {
+        $data = get_data($_CACHE, 'provinces', [
+            'country' => 'IT',
+            'region' => isset($_GET['region']) ? $_GET['region'] : '',
+            'province' => isset($_GET['province']) ? $_GET['province'] : ''
+        ]);
 
         return response(json_encode([
             'count' => count($data),
             'provinces' => $data
         ]), 200, ['content-type' => 'application/json']);
     });     
-    route('GET', '/api/v1/cities', function($_CACHE) {
-        $data = get_data($_CACHE, 'cities');
+    route('GET', '/api/v1/italy/cities', function($_CACHE) {
+        $data = get_data($_CACHE, 'cities', [
+            'country' => 'IT',
+            'region' => isset($_GET['region']) ? $_GET['region'] : '',
+            'province' => isset($_GET['province']) ? $_GET['province'] : ''
+        ]);
         
         return response(json_encode([
             'count' => count($data),
