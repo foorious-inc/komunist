@@ -1,0 +1,25 @@
+{
+	"nome": "Rio",
+	"codice": "049021",
+	"zona": {
+		"nome": "Centro",
+		"codice": "3"
+	},
+	"regione": {
+		"codice": "09",
+		"nome": "Toscana"
+	},
+	"cm": {
+		"codice": "",
+		"nome": ""
+	},
+	"provincia": {
+		"codice": "049",
+		"nome": "Livorno"
+	},
+	"sigla": "LI",
+	"codiceCatastale": "M391",
+	"cap": [
+		"57038"
+	]
+}

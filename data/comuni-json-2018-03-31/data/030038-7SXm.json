@@ -1,0 +1,26 @@
+{
+	"nome": "Fiumicello Villa Vicentina",
+	"codice": "030190",
+	"zona": {
+		"nome": "Nord-est",
+		"codice": "2"
+	},
+	"regione": {
+		"codice": "06",
+		"nome": "Friuli-Venezia Giulia"
+	},
+	"cm": {
+		"codice": "",
+		"nome": ""
+	},
+	"provincia": {
+		"codice": "030",
+		"nome": "Udine"
+	},
+	"sigla": "UD",
+	"codiceCatastale": "M399",
+	"cap": [
+		"33050",
+		"33059"
+	]
+}

@@ -1,0 +1,25 @@
+{
+	"nome": "Decimoputzu",
+	"codice": "111013",
+	"zona": {
+		"nome": "Isole",
+		"codice": "5"
+	},
+	"regione": {
+		"codice": "20",
+		"nome": "Sardegna"
+	},
+	"cm": {
+		"codice": "",
+		"nome": ""
+	},
+	"provincia": {
+		"codice": "111",
+		"nome": "Sud Sardegna"
+	},
+	"sigla": "SU",
+	"codiceCatastale": "D260",
+	"cap": [
+		"09010"
+	]
+}
