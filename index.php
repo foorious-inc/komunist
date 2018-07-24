@@ -74,7 +74,7 @@ try {
 
         $is_province = (bool) $fields[12];
         $population = (int) str_replace(',', '', $fields[19]);
-        $location_id = $is_province ? $fields[22] : $fields[22] . '@' . $fields[18];
+        $location_id = $fields[22] . $fields[18];
         $_CACHE[$location_id] = [
             'id' => $location_id,
             'name' => $fields[5] . ($fields[6] ? '/' . $fields[6] : ''),
