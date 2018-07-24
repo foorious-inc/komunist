@@ -1,9 +1,12 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require 'vendor/autoload.php';
 
-define('DATA_FILE', __DIR__ . '/cities.csv');
-define('VALID_TOKEN', 'BN78FGH'); // this is not for security, just so we can more easily disable the API if there is ever abuse
-
+define('ISTAT_DATA_FILE', __DIR__ . '/data/cities.csv'); // "CODICI STATISTICI DELLE UNITÀ AMMINISTRATIVE TERRITORIALI: COMUNI, CITTÀ METROPOLITANE, PROVINCE E REGIONI" from Istat, see https://www.istat.it/it/archivio/6789
+define('COMUNIJSON_DATA_FILE', __DIR__ . '/data/comuni-json-2018-03-31/comuni.json'); // https://github.com/matteocontrini/comuni-json/
+define('VALID_TOKEN', 'BN78FGH'); // this is not for security, just so we can more easily disable the API if there is ever abused
 
 try {
     if (!isset($_GET['access_token'])) {
@@ -13,7 +16,7 @@ try {
         throw new \Exception('invalid access token');
     }
 
-    $cities_csv = file_get_contents(DATA_FILE);
+    $cities_csv = file_get_contents(ISTAT_DATA_FILE);
 
     /* 
     Fields we're currently interested in:
@@ -315,6 +318,10 @@ try {
                     'province' => isset($_GET['province']) ? $_GET['province'] : ''
                 ]);
         }
+    });
+
+    route('GET', '/api/v1/postcodes/{postcode}', function($_CACHE) {
+        throw new \Exception('not implemented');
 
         return response(json_encode([
             'count' => count($data),
