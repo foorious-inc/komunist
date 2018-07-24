@@ -6,52 +6,49 @@ API for Italian locations focusing on Eurostat codes (NUTS, etc.).
 
 First of all, you need to pass a GET parameter called "access_token", with the value of "BN78FGH". This is just so if the API ever gets abused we can change it to disable access.
 
-### GET /provinces
+### GET /locations
 
-Returns every province in Italy.
+Returns mangled locations, with an optional "type" attribute.
 
-Example;
-
-```
-http://locations-api.dev.progettieducativi.it/api/v1/provinces?access_token=BN78FGH
-```
-
-### GET /cities
-
-Returns every city in Italy.
-
-Example;
+Example:
 
 ```
-http://locations-api.dev.progettieducativi.it/api/v1/cities?access_token=BN78FGH
+http://locations-api.dev.progettieducativi.it/api/v1/locations?access_token=BN78FGH // get all
+http://locations-api.dev.progettieducativi.it/api/v1/locations?type=region&access_token=BN78FGH
+http://locations-api.dev.progettieducativi.it/api/v1/locations?type=province&access_token=BN78FGH
+http://locations-api.dev.progettieducativi.it/api/v1/locations?type=city&access_token=BN78FGH
+```
+
+You can also filter results by adding `region` and `province` as GET parameters, using the location ID.
+
+For instance, if the ID for Tuscany is `ITI1`, you can get all its provinces with:
+
+```
+http://locations-api.dev.progettieducativi.it/api/v1/locations?type=province&region=ITI1&access_token=BN78FGH
+```
+
+Similarly, to get all cities in the province of Florence (ID `ITI14`):
+
+```
+http://locations-api.dev.progettieducativi.it/api/v1/locations?type=city&province=ITI14&access_token=BN78FGH
+```
+
+### GET /postcodes
+
+Given a postcode, returns information about its city, including everything we know along with its province and region.
+
+Example:
+
+```
+http://locations-api.dev.progettieducativi.it/api/v1/postcodes/50139?access_token=BN78FGH
 ```
 
 ## Run locally
 
 You can quickly run a server without a database in the current directory with:
 
-```
-sudo docker run -p 8777:80 -v $(pwd):/var/www/html/ ipeos/lamp-dev:latest
-```
-
-Get the Docker image with:
-
-```
-sudo docker pull ipeos/lamp-dev
+```bash
+php -S localhost:8888
 ```
 
-NOTE: you shouldn't run Docker as root, but this is the default setup.
-
-You can update the port (change `8777` to whatever you want). `$(pwd)` should mean the current directories in most shells, otherwise specify absolute path.
-
-Some vars can upgrade the php.ini
-
-PHP_ERROR_REPORTING: E_ALL & ~E_DEPRECATED & ~E_STRICT
-PHP_DISPLAY_ERRORS: On
-PHP_UPLOAD_MAX_FILE_SIZE: 20M
-PHP_POST_MAX_SIZE: 28M
-PHP_MEMORY_LIMIT: 256M
-PHP_EXPOSE_PHP: Off
-PHP_TIMEZONE: UTC
-
-For more info, see: https://github.com/ipeos-and-co/docker-lamp-dev/
+You can change "8888" into whatever port you want.
