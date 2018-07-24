@@ -318,18 +318,18 @@ try {
                     'province' => isset($_GET['province']) ? $_GET['province'] : ''
                 ]);
         }
-    });
-
-    route('GET', '/api/v1/postcodes/{postcode}', function($_CACHE) {
-        throw new \Exception('not implemented');
 
         return response(json_encode([
             'count' => count($data),
             'locations' => $data
-        ]), 200, ['content-type' => 'application/json']);
+        ]), 200, ['content-type' => 'application/json']);        
+    });
+
+    route('GET', '/api/v1/postcodes/{postcode}', function($_CACHE) {
+        throw new \Exception('not implemented');
     });        
 
-    dispatch($_CACHE, null);
+    dispatch($_CACHE);
 } catch (Exception $e) {
     http_response_code(400);
     header('Content-Type: application/json');
