@@ -9,6 +9,32 @@ $display_errors = reset(explode(':', $_SERVER['HTTP_HOST'])) == 'localhost';
 error_reporting(E_ALL);
 ini_set('display_errors', $display_errors);
 
+// array holding allowed origin domains. can be '*' for all, or array for specific domains
+$allowed_origins = '*'; /* array(
+    '(http(s)://)?(www\.)?my\-domain\.com'
+);*/
+$allow = false;
+if (isset($_SERVER['HTTP_ORIGIN']) && $_SERVER['HTTP_ORIGIN'] != '') {
+    if (is_array($allowed_origins)) {
+        foreach ($allowed_origins as $allowed_origin) {
+            if (preg_match('#' . $allowed_origin . '#', $_SERVER['HTTP_ORIGIN'])) {
+                $allow = true;
+                break;
+            }
+        }
+    } else {
+        if ($allowed_origins == '*') {
+            $allow = true;
+        }
+    }
+}
+if ($allow) {
+    header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
+    header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
+    header('Access-Control-Max-Age: 1000');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
+}
+
 require 'vendor/autoload.php';
 
 define('ISTAT_DATA_FILE', __DIR__ . '/data/cities.csv'); // "CODICI STATISTICI DELLE UNITÀ AMMINISTRATIVE TERRITORIALI: COMUNI, CITTÀ METROPOLITANE, PROVINCE E REGIONI" from Istat, see https://www.istat.it/it/archivio/6789
