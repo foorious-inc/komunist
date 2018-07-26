@@ -6,7 +6,7 @@ require 'vendor/autoload.php';
 
 define('ISTAT_DATA_FILE', __DIR__ . '/data/cities.csv'); // "CODICI STATISTICI DELLE UNITÀ AMMINISTRATIVE TERRITORIALI: COMUNI, CITTÀ METROPOLITANE, PROVINCE E REGIONI" from Istat, see https://www.istat.it/it/archivio/6789
 define('COMUNIJSON_DATA_FILE', __DIR__ . '/data/comuni-json-2018-03-31/comuni.json'); // https://github.com/matteocontrini/comuni-json/
-define('VALID_TOKEN', 'BN78FGH'); // this is not for security, just so we can more easily disable the API if there is ever abused
+define('VALID_TOKEN', 'LOC_BN78FGHiH839X'); // this is not for security, just so we can more easily disable the API if there is ever abused
 
 try {
     if (!isset($_GET['access_token'])) {
@@ -325,7 +325,7 @@ try {
         ]), 200, ['content-type' => 'application/json']);        
     });
 
-    route('GET', '/api/v1/postcodes/{postcode}', function($_CACHE) {
+    route('GET', '/api/v1/postcodes/:postcode', function($_CACHE) {
         throw new \Exception('not implemented');
     });        
 
