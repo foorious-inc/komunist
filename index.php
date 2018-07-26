@@ -1,6 +1,12 @@
 <?php
+/*
+Ok, so this is the API.
+
+We're currently using two file: Istat e Comuni JSON. The reason for this is simply that Comuni JSON doesn't have NUTS codes.
+*/
+
 error_reporting(E_ALL);
-ini_set('display_errors', 0);
+ini_set('display_errors', 1);
 
 require 'vendor/autoload.php';
 
@@ -16,8 +22,9 @@ try {
         throw new \Exception('invalid access token');
     }
 
-    $cities_csv = file_get_contents(ISTAT_DATA_FILE);
+    $_ISTAT_DATA = [];
 
+    ///////////////////////////////// add Istat data to cache /////////////////////////////////
     /* 
     Fields we're currently interested in:
     ---
@@ -58,11 +65,9 @@ try {
     24 Codice NUTS2 2006 (3)
     25 Codice NUTS3 2006
     */
-
-    $_CACHE = [];
-
-    $lines = explode("\n", trim($cities_csv, "\n"));
-
+    $istat_csv = file_get_contents(ISTAT_DATA_FILE);
+    
+    $lines = explode("\n", trim($istat_csv, "\n"));
     for ($i=0; $i<count($lines); $i++) {
         if ($i == 0) {
             continue;
@@ -75,7 +80,7 @@ try {
         $is_province = (bool) $fields[12];
         $population = (int) str_replace(',', '', $fields[19]);
         $location_id = $fields[22] . $fields[18];
-        $_CACHE[$location_id] = [
+        $_ISTAT_DATA[$location_id] = [
             'id' => $location_id,
             'name' => $fields[5] . ($fields[6] ? '/' . $fields[6] : ''),
 
@@ -88,7 +93,9 @@ try {
         ];
     }
 
-    function get_data($_CACHE, $data_type, $options=[]) {
+    ///////////////////////////////// add postcodes to cache /////////////////////////////////
+
+    function get_location_data($_ISTAT_DATA, $data_type, $options=[]) {
         $data = [];
     
         switch ($data_type) {
@@ -101,9 +108,9 @@ try {
             //     // ITZ EXTRA-REGIO            
             //     break;
             case 'locations':
-                $regions = get_data($_CACHE, 'regions', $options);
-                $provinces = get_data($_CACHE, 'provinces', $options);
-                $cities = get_data($_CACHE, 'cities', $options);
+                $regions = get_location_data($_ISTAT_DATA, 'regions', $options);
+                $provinces = get_location_data($_ISTAT_DATA, 'provinces', $options);
+                $cities = get_location_data($_ISTAT_DATA, 'cities', $options);
 
                 $data = array_merge($regions, $provinces, $cities);
                 break;
@@ -238,7 +245,7 @@ try {
                 ];
                 break;
             case 'provinces':
-                foreach ($_CACHE as $city_data) {
+                foreach ($_ISTAT_DATA as $city_data) {
                     if ($city_data['is_province']) {
                         $city_data['type'] = 'province';
                         $data[] = $city_data;
@@ -246,7 +253,7 @@ try {
                 }            
                 break;                
             case 'cities':
-                foreach ($_CACHE as $city_data) {
+                foreach ($_ISTAT_DATA as $city_data) {
                     $city_data['type'] = 'city';
                     $data[] = $city_data;
                 }            
@@ -288,31 +295,33 @@ try {
     }
 
     // set routes
-    route('GET', '/api/v1/locations', function($_CACHE) {
+    route('GET', '/api/v1/locations', function($args) {
+        global $_ISTAT_DATA;
+
         switch ($_GET['type']) {
             case 'region':
-                $data = get_data($_CACHE, 'regions', [
+                $data = get_location_data($_ISTAT_DATA, 'regions', [
                     'country' => 'IT',
                     'region' => isset($_GET['region']) ? $_GET['region'] : '',
                     'province' => isset($_GET['province']) ? $_GET['province'] : ''
                 ]);
                 break;
             case 'province':
-                $data = get_data($_CACHE, 'provinces', [
+                $data = get_location_data($_ISTAT_DATA, 'provinces', [
                     'country' => 'IT',
                     'region' => isset($_GET['region']) ? $_GET['region'] : '',
                     'province' => isset($_GET['province']) ? $_GET['province'] : ''
                 ]);
                 break;
             case 'city':
-                $data = get_data($_CACHE, 'cities', [
+                $data = get_location_data($_ISTAT_DATA, 'cities', [
                     'country' => 'IT',
                     'region' => isset($_GET['region']) ? $_GET['region'] : '',
                     'province' => isset($_GET['province']) ? $_GET['province'] : ''
                 ]);
                 break;
             default:
-                $data = get_data($_CACHE, 'locations', [
+                $data = get_location_data($_ISTAT_DATA, 'locations', [
                     'country' => 'IT',
                     'region' => isset($_GET['region']) ? $_GET['region'] : '',
                     'province' => isset($_GET['province']) ? $_GET['province'] : ''
@@ -325,11 +334,46 @@ try {
         ]), 200, ['content-type' => 'application/json']);        
     });
 
-    route('GET', '/api/v1/postcodes/:postcode', function($_CACHE) {
-        throw new \Exception('not implemented');
+    route('GET', '/api/v1/postcodes/:postcode', function($args) {
+        global $_ISTAT_DATA;
+
+        // echo '<pre>' . print_r($_ISTAT_DATA, true) . '</pre>';
+        // exit;        
+
+        $comunijson_json = json_decode(file_get_contents(COMUNIJSON_DATA_FILE), true);
+        if (!$comunijson_json) {
+            throw new \Exception('unable to parse JSON');
+        }
+
+        // echo '<pre>' . print_r($comunijson_json, true) . '</pre>';
+        // exit;
+
+        foreach ($comunijson_json as $city) {
+            if (in_array($args['postcode'], $city['cap'])) {
+                // we have data, but we have to query Istat data to get NUTS codes (and therefore location ID). Use cad code since it's one thing the 2 data sources have in common
+                $istat_cities = get_location_data($_ISTAT_DATA, 'cities');
+                foreach ($istat_cities as $istat_city) {
+                    if ($istat_city['cad_code'] == $city['codiceCatastale']) {
+                        $location_id = $istat_city['nuts_2010_code'] . $city['codiceCatastale'];
+
+                        return response(json_encode([
+                            'ok' => true,
+                            'data' => $_ISTAT_DATA[$location_id]
+                        ]), 200, ['content-type' => 'application/json']);        
+                    }
+                }
+            }
+        }
+
+        return response(json_encode([
+            'ok' => true,
+        ]), 404);        
+
+        // echo '<pre>' . print_r($comunijson_json, true) . '</pre>';
+        // exit;
     });        
 
-    dispatch($_CACHE);
+    dispatch($_ISTAT_DATA);
 } catch (Exception $e) {
     http_response_code(400);
     header('Content-Type: application/json');
