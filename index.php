@@ -5,8 +5,9 @@ Ok, so this is the API.
 We're currently using two file: Istat e Comuni JSON. The reason for this is simply that Comuni JSON doesn't have NUTS codes.
 */
 
+$display_errors = reset(explode(':', $_SERVER['HTTP_HOST'])) == 'localhost';
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', $display_errors);
 
 require 'vendor/autoload.php';
 
