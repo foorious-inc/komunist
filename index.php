@@ -111,7 +111,7 @@ try {
             'id' => $location_id,
             'name' => $fields[5] . ($fields[6] ? '/' . $fields[6] : ''),
 
-            'nuts_2010_code' => $fields[22],
+            'nuts3_2010_code' => $fields[22],
             'cad_code' => $fields[18],
             'license_plate_code' =>$fields[13],
 
@@ -147,127 +147,127 @@ try {
                         'id' => 'ITC1',
                         'type' => 'region',
                         'name' => 'Piemonte',
-                        'nuts_2010_code' => ''
+                        'nuts3_2010_code' => ''
                     ],
                     [
                         'id' => 'ITC2',
                         'type' => 'region',
                         'name' => 'Valle d’Aosta/Vallée d’Aoste',
-                        'nuts_2010_code' => 'ITC2'
+                        'nuts3_2010_code' => 'ITC2'
                     ],
                     [
                         'id' => 'ITC3',
                         'type' => 'region',
                         'name' => 'Liguria',
-                        'nuts_2010_code' => 'ITC3'
+                        'nuts3_2010_code' => 'ITC3'
                     ],                                        
                     [
                         'id' => 'ITC4',
                         'type' => 'region',
                         'name' => 'Lombardia',
-                        'nuts_2010_code' => 'ITC4'
+                        'nuts3_2010_code' => 'ITC4'
                     ],
                     [
                         'id' => 'ITF1',
                         'type' => 'region',
                         'name' => 'Abruzzo',
-                        'nuts_2010_code' => 'ITF1'
+                        'nuts3_2010_code' => 'ITF1'
                     ],
                     [
                         'id' => 'ITF2',
                         'type' => 'region',
                         'name' => 'Molise',
-                        'nuts_2010_code' => 'ITF2'
+                        'nuts3_2010_code' => 'ITF2'
                     ],                                        
                     [
                         'id' => 'ITF3',
                         'type' => 'region',
                         'name' => 'Campania',
-                        'nuts_2010_code' => 'ITF3'
+                        'nuts3_2010_code' => 'ITF3'
                     ],
                     [
                         'id' => 'ITF4',
                         'type' => 'region',
                         'name' => 'Puglia',
-                        'nuts_2010_code' => 'ITF4'
+                        'nuts3_2010_code' => 'ITF4'
                     ],
                     [
                         'id' => 'ITF5',
                         'type' => 'region',
                         'name' => 'Basilicata',
-                        'nuts_2010_code' => 'ITF5'
+                        'nuts3_2010_code' => 'ITF5'
                     ],                                        
                     [
                         'id' => 'ITF6',
                         'type' => 'region',
                         'name' => 'Calabria',
-                        'nuts_2010_code' => 'ITF6'
+                        'nuts3_2010_code' => 'ITF6'
                     ],
                     [
                         'id' => 'ITG1',
                         'type' => 'region',
                         'name' => 'Sicilia',
-                        'nuts_2010_code' => 'ITG1'
+                        'nuts3_2010_code' => 'ITG1'
                     ],
                     [
                         'id' => 'ITG2',
                         'type' => 'region',
                         'name' => 'Sardegna',
-                        'nuts_2010_code' => 'ITG2'
+                        'nuts3_2010_code' => 'ITG2'
                     ],                                        
                     [
                         'id' => 'ITH1',
                         'type' => 'region',
                         'name' => 'Provincia Autonoma di Bolzano/Bozen',
-                        'nuts_2010_code' => 'ITH1'
+                        'nuts3_2010_code' => 'ITH1'
                     ],
                     [
                         'id' => 'ITH2',
                         'type' => 'region',
                         'name' => 'Provincia Autonoma di Trento',
-                        'nuts_2010_code' => 'ITH2'
+                        'nuts3_2010_code' => 'ITH2'
                     ],
                     [
                         'id' => 'ITH3',
                         'type' => 'region',
                         'name' => 'Veneto',
-                        'nuts_2010_code' => 'ITH3'
+                        'nuts3_2010_code' => 'ITH3'
                     ],                                        
                     [
                         'id' => 'ITH4',
                         'type' => 'region',
                         'name' => 'Friuli-Venezia Giulia',
-                        'nuts_2010_code' => 'ITH4'
+                        'nuts3_2010_code' => 'ITH4'
                     ],
                     [
                         'id' => 'ITH5',
                         'type' => 'region',
                         'name' => 'Emilia-Romagna',
-                        'nuts_2010_code' => 'ITH5'
+                        'nuts3_2010_code' => 'ITH5'
                     ],
                     [
                         'id' => 'ITI1',
                         'type' => 'region',
                         'name' => 'Toscana',
-                        'nuts_2010_code' => 'ITI1'
+                        'nuts3_2010_code' => 'ITI1'
                     ],                                        
                     [
                         'id' => 'ITI2',
                         'type' => 'region',
                         'name' => 'Umbria',
-                        'nuts_2010_code' => 'ITI2'
+                        'nuts3_2010_code' => 'ITI2'
                     ],
                     [
                         'id' => 'ITI3',
                         'type' => 'region',
                         'name' => 'Marche',
-                        'nuts_2010_code' => 'ITI3'
+                        'nuts3_2010_code' => 'ITI3'
                     ],
                     [
                         'id' => 'ITI4',
                         'type' => 'region',
                         'name' => 'Lazio',
-                        'nuts_2010_code' => 'ITI4'
+                        'nuts3_2010_code' => 'ITI4'
                     ]
                 ];
                 break;
@@ -302,10 +302,10 @@ try {
 
         // filter data
         if (is_array($options) && count($options)) {
-            foreach ($data as $location_id=>$location) {
+            foreach ($data as $location_id => $location) {
                 foreach (['country', 'region', 'province'] as $option_name) {
                     if (isset($options[$option_name]) && $options[$option_name]) {
-                        if (strpos(strtoupper($location['nuts_2010_code']), strtoupper($options[$option_name])) !== 0) {
+                        if (strpos(strtoupper($location['nuts3_2010_code']), strtoupper($options[$option_name])) !== 0) {
                             unset($data[$location_id]);
                         }
                     }
@@ -381,7 +381,7 @@ try {
                 $istat_cities = get_location_data($_ISTAT_DATA, 'cities');
                 foreach ($istat_cities as $istat_city) {
                     if ($istat_city['cad_code'] == $city['codiceCatastale']) {
-                        $location_id = $istat_city['nuts_2010_code'] . $city['codiceCatastale'];
+                        $location_id = $istat_city['nuts3_2010_code'] . $city['codiceCatastale'];
 
                         return response(json_encode([
                             'ok' => true,
