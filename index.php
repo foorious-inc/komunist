@@ -303,13 +303,30 @@ try {
         // filter data
         if (is_array($options) && count($options)) {
             foreach ($data as $location_id => $location) {
-                foreach (['country', 'region', 'province'] as $option_name) {
-                    if (isset($options[$option_name]) && $options[$option_name]) {
-                        if (strpos(strtoupper($location['nuts3_2010_code']), strtoupper($options[$option_name])) !== 0) {
-                            unset($data[$location_id]);
-                        }
+                if (isset($options['country']) && $options['country']) {
+                    // to figure out country, look at first 2 letter of ID.
+                    if (substr($location['id'], 0, 2) != $options['country']) {
+                        unset($data[$location_id]);
+
+                        continue;
                     }
                 }
+                if (isset($options['region']) && $options['region']) {
+                    // to figure out country, look at first 4 letters of ID.
+                    if (substr($location['id'], 0, 4) != substr($options['region'], 0, 4)) {
+                        unset($data[$location_id]);
+
+                        continue;
+                    }
+                }                                
+                if (isset($options['province']) && $options['province']) {
+                    // to figure out country, look at first 5 letters of ID.
+                    if (substr($location['id'], 0, 5) != substr($options['province'], 0, 5)) {
+                        unset($data[$location_id]);
+
+                        continue;
+                    }
+                }                
             }
         }
 
@@ -325,7 +342,9 @@ try {
     route('GET', '/api/v1/locations', function($args) {
         global $_ISTAT_DATA;
 
-        switch ($_GET['type']) {
+        $type = isset($_GET['type']) && $_GET['type'] ? $_GET['type'] : '';
+
+        switch ($type) {
             case 'region':
                 $data = get_location_data($_ISTAT_DATA, 'regions', [
                     'country' => 'IT',
@@ -364,16 +383,10 @@ try {
     route('GET', '/api/v1/postcodes/:postcode', function($args) {
         global $_ISTAT_DATA;
 
-        // echo '<pre>' . print_r($_ISTAT_DATA, true) . '</pre>';
-        // exit;        
-
         $comunijson_json = json_decode(file_get_contents(COMUNIJSON_DATA_FILE), true);
         if (!$comunijson_json) {
             throw new \Exception('unable to parse JSON');
         }
-
-        // echo '<pre>' . print_r($comunijson_json, true) . '</pre>';
-        // exit;
 
         foreach ($comunijson_json as $city) {
             if (in_array($args['postcode'], $city['cap'])) {
@@ -395,9 +408,6 @@ try {
         return response(json_encode([
             'ok' => true,
         ]), 404);        
-
-        // echo '<pre>' . print_r($comunijson_json, true) . '</pre>';
-        // exit;
     });        
 
     dispatch($_ISTAT_DATA);
