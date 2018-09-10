@@ -10,29 +10,44 @@ error_reporting(E_ALL);
 ini_set('display_errors', $display_errors);
 
 // array holding allowed origin domains. can be '*' for all, or array for specific domains
-$allowed_origins = '*'; /* array(
-    '(http(s)://)?(www\.)?my\-domain\.com'
-);*/
+$allowed_origins = '*'; 
+// $allowed_origins = [
+//     '(http(s)://)?(www\.)?my\-domain\.com',
+//     'etc',
+//     'etc'
+// ];
+
 $allow = false;
-if (isset($_SERVER['HTTP_ORIGIN']) && $_SERVER['HTTP_ORIGIN'] != '') {
-    if (is_array($allowed_origins)) {
-        foreach ($allowed_origins as $allowed_origin) {
-            if (preg_match('#' . $allowed_origin . '#', $_SERVER['HTTP_ORIGIN'])) {
-                $allow = true;
-                break;
+if ($allowed_origins == '*') {
+    $allow = true;
+} else {
+    if (!is_array($allowed_origins)) {
+        $allowed_origins = [$allowed_origins];
+    }
+
+    if (isset($_SERVER['HTTP_ORIGIN']) && $_SERVER['HTTP_ORIGIN'] != '') {
+        if (is_array($allowed_origins)) {
+            foreach ($allowed_origins as $allowed_origin) {
+                if (preg_match('#' . $allowed_origin . '#', $_SERVER['HTTP_ORIGIN'])) {
+                    $allow = true;
+                    break;
+                }
             }
-        }
-    } else {
-        if ($allowed_origins == '*') {
-            $allow = true;
         }
     }
 }
+
 if ($allow) {
-    header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
+    header('Access-Control-Allow-Origin: ' . (!empty($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : ''));
     header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
     header('Access-Control-Max-Age: 1000');
     header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
+
+    if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+        http_response_code(200);
+        
+        exit;
+    }
 }
 
 require 'vendor/autoload.php';
