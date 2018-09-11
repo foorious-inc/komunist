@@ -131,7 +131,12 @@ try {
             'license_plate_code' =>$fields[13],
 
             'population' => $population,
-            'is_province' => $is_province
+            'is_province' => $is_province,
+
+            'region' => [
+                'id' => $fields[21],
+                'name' => $fields[9]
+            ]
         ];
     }
 
