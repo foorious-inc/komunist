@@ -1,4 +1,4 @@
-# locations-api
+# 🌍 locations-api
 
 API for Italian locations focusing on Eurostat codes (NUTS, etc.).
 
