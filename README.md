@@ -71,3 +71,7 @@ Donate >= EUR 5/mo. to become a backer and support the project.
 Donate >= EUR 50/mo. to become a sponsor and make this project possible.
 
 <span class="badge-patreon"><a href="https://www.patreon.com/bePatron?c=1739321" title="Donate to this project using Patreon"><img src="https://img.shields.io/badge/patreon-donate-yellow.svg" alt="Patreon donate button" /></a></span>
+
+## License
+
+This project is licensed under the MIT license. For licensing on data, see respective owners/projects.
