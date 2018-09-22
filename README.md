@@ -2,6 +2,11 @@
 
 Utils/API for Italian comuni, provinces, and regions.
 
+## Data
+
+- data on comuni from https://github.com/matteocontrini/comuni-json/
+- NUTS data from Istat (https://www.istat.it/en/)
+
 ## Endpoints
 
 ~~First of all, you need to pass a GET parameter called "access_token", with the value of "BN78FGH". This is just so if the API ever gets abused we can change it to disable access~~.
