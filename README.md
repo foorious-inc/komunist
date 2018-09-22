@@ -1,6 +1,6 @@
-# 🌍 locations-api
+# 🌍 Komunist
 
-API for Italian locations focusing on Eurostat codes (NUTS, etc.).
+Utils/API for Italian comuni, provinces, and regions.
 
 ## Endpoints
 
