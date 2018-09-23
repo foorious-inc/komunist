@@ -1,4 +1,4 @@
-# 🌍 Komunist
+# 🌆 Komunist
 
 Utils/API for Italian comuni, provinces, and regions.
 
