@@ -12,6 +12,56 @@ class Komunist
     const LOCATION_TYPE_PROVINCE = 'province';
     const LOCATION_TYPE_REGION = 'region';
 
+    private static $_cities = []; // all cities
+    private static $_citiesByCadCode = []; // all cities, organized by postcode
+    private static $_postcodes = []; // all postcodes, organized by cad codes
+
+    private static function _init() {        
+        // build some caches and indexes just in the meantime that there's no database
+        try {
+            if (count(self::$_cities) > 0) { // already initialized
+                return;
+            }
+
+            // first, build index of postcodes (needed by _getLocationsData)
+            if (!is_readable(self::COMUNIJSON_DATA_FILE)) {
+                throw new \Exception('cannot read comuni JSON');
+            }
+            $comunijson_json = json_decode(file_get_contents(self::COMUNIJSON_DATA_FILE), true);
+            if (!$comunijson_json) {
+                throw new \Exception('unable to parse JSON');
+            }
+            foreach ($comunijson_json as $city) {
+                if (!empty(self::$_postcodes[$city['codiceCatastale']])) {
+                    throw new \Exception('trying to add postcode to index twice');
+                }
+
+
+                self::$_postcodes[$city['codiceCatastale']] = $city['cap'];
+            }
+
+            // index bycad code
+            $cities = self::_getLocationData('city');
+            if (empty(self::$_citiesByCadCode)) {
+                foreach ($cities as $city) {
+                    if (empty($city['cad_code'])) {
+                        continue;
+                    }
+                    if (!empty(self::$_citiesByCadCode[$city['cad_code']])) {
+                        throw new \Exception('trying to add city to cad codes index again');
+                    }
+                    
+                    self::$_citiesByCadCode[$city['cad_code']] = $city;
+                }
+            }
+
+            // save index of all cities
+            self::$_cities = $cities;
+        } catch (\Exception $e) {
+           die('unable to create index: ' . $e->getMessage());
+        }
+    }
+
     private static function _getIstatData() {
         $istat_data = [];
 
@@ -99,6 +149,10 @@ class Komunist
     }
 
     private static function _getLocationData($location_type, $options=[]) {
+        if (empty(self::$_postcodes)) {
+            throw new \Exception('postcode index missing');
+        }
+
         $istat_data = self::_getIstatData();
         if (!$istat_data) {
             throw new \Exception('unable to get ISTAT data');
@@ -256,6 +310,7 @@ class Komunist
                 foreach ($istat_data as $city_data) {
                     if ($city_data['is_province']) {
                         $city_data['type'] = self::LOCATION_TYPE_PROVINCE;
+                        $city_data['postcodes'] = self::$_postcodes[$city_data['cad_code']];
                         $data[] = $city_data;
                     }
                 }            
@@ -263,6 +318,11 @@ class Komunist
             case self::LOCATION_TYPE_CITY:
                 foreach ($istat_data as $city_data) {
                     $city_data['type'] = self::LOCATION_TYPE_CITY;
+                    if (!empty(self::$_postcodes[$city_data['cad_code']])) {
+                        $city_data['postcodes'] = self::$_postcodes[$city_data['cad_code']];
+                    } else {
+                        $city_data['postcodes'] = [];
+                    }
                     $data[] = $city_data;
                 }            
                 break;            
@@ -320,6 +380,8 @@ class Komunist
     }    
 
     public static function getLocations($location_type='', $options, $return_type) {
+        self::_init();
+
         $country = 'IT';
         $region = $options['region'] ? $options['region'] : '';
         $province = $options['province'] ? $options['province'] : '';
@@ -346,72 +408,21 @@ class Komunist
     }
 
     public static function getCityByPostcode($postcode, $return_type) {
-        // in the future, we will return objects instead of arrays (although one will be able to use toArray()).
-        // let's force passing output type explicityl to keep compatibility/ease migration in the future
-        if ($return_type != self::RETURN_TYPE_ARRAY) {
-            throw new \Exception('unsupported output type');
-        }
-
-        if (!is_readable(self::COMUNIJSON_DATA_FILE)) {
-            throw new \Exception('cannot read comuni JSON');
-        }
-        $istat_data = self::_getIstatData();
-        
-        $comunijson_json = json_decode(file_get_contents(self::COMUNIJSON_DATA_FILE), true);
-        if (!$comunijson_json) {
-            throw new \Exception('unable to parse JSON');
-        }
-
-        foreach ($comunijson_json as $city) {
-            if (in_array($postcode, $city['cap'])) {
-                // we have data, but we have to query Istat data to get NUTS codes (and therefore location ID). Use cad code since it's one thing the 2 data sources have in common
-                $istat_cities = self::_getLocationData('city');
-                foreach ($istat_cities as $istat_city) {
-                    if ($istat_city['cad_code'] == $city['codiceCatastale']) {
-                        $location_id = $istat_city['nuts3_2010_code'] . $city['codiceCatastale'];
-
-                        return $istat_data[$location_id];
-                    }
-                }
-            }
-        }
-
-        return false;
+        throw new \Exception('actually, a single postcode can span multiple cities, this method doesn\'t make sense');
     }
 
     public static function getCityByCadCode($cad_code, $return_type) {
+        self::_init();
+
         // in the future, we will return objects instead of arrays (although one will be able to use toArray()).
         // let's force passing output type explicityl to keep compatibility/ease migration in the future
         if ($return_type != self::RETURN_TYPE_ARRAY) {
             throw new \Exception('unsupported output type');
         }
 
-        if (!is_readable(self::COMUNIJSON_DATA_FILE)) {
-            throw new \Exception('cannot read comuni JSON');
-        }
-        $istat_data = self::_getIstatData();
-        
-        $comunijson_json = json_decode(file_get_contents(self::COMUNIJSON_DATA_FILE), true);
-        if (!$comunijson_json) {
-            throw new \Exception('unable to parse JSON');
-        }
+        $city = !empty(self::$_citiesByCadCode[$cad_code]) ? self::$_citiesByCadCode[$cad_code] : null;
 
-        foreach ($comunijson_json as $city) {
-            if ($cad_code == $city['codiceCatastale']) {
-                // we have data, but we have to query Istat data to get NUTS codes (and therefore location ID). Use cad code since it's one thing the 2 data sources have in common
-                $istat_cities = self::_getLocationData('city');
-                foreach ($istat_cities as $istat_city) {
-                    if ($istat_city['cad_code'] == $city['codiceCatastale']) {
-                        $location_id = $istat_city['nuts3_2010_code'] . $city['codiceCatastale'];
-
-                        return $istat_data[$location_id];
-                    }
-                }
-            }
-        }
-
-        return false;
+        return $city;
     }
-
 }
 ?>
