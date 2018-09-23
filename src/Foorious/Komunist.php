@@ -378,5 +378,40 @@ class Komunist
 
         return false;
     }
+
+    public static function getCityByCadCode($cad_code, $return_type) {
+        // in the future, we will return objects instead of arrays (although one will be able to use toArray()).
+        // let's force passing output type explicityl to keep compatibility/ease migration in the future
+        if ($return_type != self::RETURN_TYPE_ARRAY) {
+            throw new \Exception('unsupported output type');
+        }
+
+        if (!is_readable(self::COMUNIJSON_DATA_FILE)) {
+            throw new \Exception('cannot read comuni JSON');
+        }
+        $istat_data = self::_getIstatData();
+        
+        $comunijson_json = json_decode(file_get_contents(self::COMUNIJSON_DATA_FILE), true);
+        if (!$comunijson_json) {
+            throw new \Exception('unable to parse JSON');
+        }
+
+        foreach ($comunijson_json as $city) {
+            if ($cad_code == $city['codiceCatastale']) {
+                // we have data, but we have to query Istat data to get NUTS codes (and therefore location ID). Use cad code since it's one thing the 2 data sources have in common
+                $istat_cities = self::_getLocationData('city');
+                foreach ($istat_cities as $istat_city) {
+                    if ($istat_city['cad_code'] == $city['codiceCatastale']) {
+                        $location_id = $istat_city['nuts3_2010_code'] . $city['codiceCatastale'];
+
+                        return $istat_data[$location_id];
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
 }
 ?>
