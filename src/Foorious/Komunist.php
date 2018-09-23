@@ -365,7 +365,7 @@ class Komunist
         foreach ($comunijson_json as $city) {
             if (in_array($postcode, $city['cap'])) {
                 // we have data, but we have to query Istat data to get NUTS codes (and therefore location ID). Use cad code since it's one thing the 2 data sources have in common
-                $istat_cities = self::_getLocationData('cities');
+                $istat_cities = self::_getLocationData('city');
                 foreach ($istat_cities as $istat_city) {
                     if ($istat_city['cad_code'] == $city['codiceCatastale']) {
                         $location_id = $istat_city['nuts3_2010_code'] . $city['codiceCatastale'];
