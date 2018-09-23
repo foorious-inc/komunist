@@ -2,6 +2,8 @@
 
 Utils/API for Italian comuni, provinces, and regions.
 
+Pron. Kom&ugrave;nist (from "comuni").
+
 ## Data
 
 - data on comuni from https://github.com/matteocontrini/comuni-json/
