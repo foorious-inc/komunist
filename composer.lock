@@ -1,11 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "hash": "304b089232986379f8cd84b1499e32fe",
-    "content-hash": "fa6e80686aff43d965304b09eea39932",
+    "content-hash": "5b0bfee2a9d32b51d996f786451f2e91",
     "packages": [
         {
             "name": "noodlehaus/dispatch",
@@ -109,7 +108,7 @@
                 "microphp",
                 "router"
             ],
-            "time": "2016-02-03 17:02:06"
+            "time": "2016-02-03T17:02:06+00:00"
         }
     ],
     "packages-dev": [],
