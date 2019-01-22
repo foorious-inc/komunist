@@ -1,5 +1,5 @@
 {
-    "name": "foorious/komunist",
+    "name": "foorious-inc/komunist",
     "description": "Utils/API for Italian comuni, provinces, and regions",
 	"version": "0.2.1",
     "license": "MIT",
@@ -9,12 +9,12 @@
             "email": "me@nbrogi.com"
         }
     ],
+    "require": {
+        "noodlehaus/dispatch": "^10.2"
+    },
     "autoload": {
         "psr-4": {
             "" : "src/"
         }
-    },
-    "require": {
-        "noodlehaus/dispatch": "^10.2"
     }
 }
