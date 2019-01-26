@@ -9,9 +9,7 @@
             "email": "me@nbrogi.com"
         }
     ],
-    "require": {
-        "noodlehaus/dispatch": "^10.2"
-    },
+    "require": {},
     "autoload": {
         "psr-4": {
             "" : "src/"
