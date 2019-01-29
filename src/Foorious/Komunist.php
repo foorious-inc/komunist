@@ -62,7 +62,7 @@ class Komunist
                 $cities = self::_getLocationData(self::LOCATION_TYPE_CITY);
                 foreach ($cities as $city) {
                     if (empty($city['cad_code'])) {
-                        continue;
+                        throw new \Exception('no CAD code!?');
                     }
                     if (!empty(self::$_citiesByCadCode[$city['cad_code']])) {
                         throw new \Exception('trying to add city to cad codes index again');
@@ -351,10 +351,10 @@ class Komunist
                             'id' => $province_data['id'],
                             'name' => $province_data['name']
                         ];
-                        $data[] = $city_data;
                     } else {
-                        $data['province'] = $city_data;
+                        $city_data['province'] = $city_data;
                     }
+                    $data[] = $city_data;
                 }
                 break;
             default:
