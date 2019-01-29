@@ -387,8 +387,8 @@ class Komunist
         self::_init();
 
         $country = 'IT';
-        $region = $options['region'] ? $options['region'] : '';
-        $province = $options['province'] ? $options['province'] : '';
+        $region = !empty($options['region']) ? $options['region'] : '';
+        $province = !empty($options['province']) ? $options['province'] : '';
 
         // in the future, we will return objects instead of arrays (although one will be able to use toArray()).
         // let's force passing output type explicityl to keep compatibility/ease migration in the future
