@@ -12,6 +12,7 @@ class Komunist
     const LOCATION_TYPE_PROVINCE = 'province';
     const LOCATION_TYPE_REGION = 'region';
 
+    private static $_provincesByNUTSCode = []; // all provinces, organized by license plate
     private static $_cities = []; // all cities
     private static $_citiesByCadCode = []; // all cities, organized by postcode
     private static $_postcodes = []; // all postcodes, organized by cad codes
@@ -40,13 +41,25 @@ class Komunist
                     throw new \Exception('trying to add postcode to index twice');
                 }
 
-
                 self::$_postcodes[$city['codiceCatastale']] = $city['cap'];
             }
 
-            // index bycad code
-            $cities = self::_getLocationData('city');
+            // index provinces by license_place_code
+            if (empty(self::$_provincesByNUTSCode)) {
+                $provinces = self::_getLocationData(self::LOCATION_TYPE_PROVINCE);
+
+                foreach ($provinces as $province) {
+                    if (empty($province['nuts3_2010_code'])) {
+                        continue;
+                    }
+
+                    self::$_provincesByNUTSCode[$province['nuts3_2010_code']] = $province;
+                }
+            }
+
+            // index cities by cad code
             if (empty(self::$_citiesByCadCode)) {
+                $cities = self::_getLocationData(self::LOCATION_TYPE_CITY);
                 foreach ($cities as $city) {
                     if (empty($city['cad_code'])) {
                         continue;
@@ -150,6 +163,10 @@ class Komunist
         }
 
         return $istat_data;
+    }
+
+    private static function _getProvinceData($city_data) {
+        return !empty(self::$_provincesByNUTSCode[$city_data['nuts3_2010_code']]) ? self::$_provincesByNUTSCode[$city_data['nuts3_2010_code']] : false;
     }
 
     private static function _getLocationData($location_type, $options=[]) {
@@ -315,6 +332,7 @@ class Komunist
                     if ($city_data['is_province']) {
                         $city_data['type'] = self::LOCATION_TYPE_PROVINCE;
                         $city_data['postcodes'] = self::$_postcodes[$city_data['cad_code']];
+                        $city_data['province'] = $city_data;
                         $data[] = $city_data;
                     }
                 }
@@ -327,7 +345,16 @@ class Komunist
                     } else {
                         $city_data['postcodes'] = [];
                     }
-                    $data[] = $city_data;
+                    if (!$city_data['is_province']) {
+                        $province_data = self::_getProvinceData($city_data);
+                        $city_data['province'] = [
+                            'id' => $province_data['id'],
+                            'name' => $province_data['name']
+                        ];
+                        $data[] = $city_data;
+                    } else {
+                        $data['province'] = $city_data;
+                    }
                 }
                 break;
             default:
@@ -349,24 +376,21 @@ class Komunist
         if (is_array($options) && count($options)) {
             foreach ($data as $location_id => $location) {
                 if (isset($options['country']) && $options['country']) {
-                    // to figure out country, look at first 2 letter of ID.
-                    if (substr($location['id'], 0, 2) != $options['country']) {
+                    if (substr($location['id'], 0, 2) != $options['country']) { // to figure out country, look at first 2 letter of ID.
                         unset($data[$location_id]);
 
                         continue;
                     }
                 }
                 if (isset($options['region']) && $options['region']) {
-                    // to figure out country, look at first 4 letters of ID.
-                    if (substr($location['id'], 0, 4) != substr($options['region'], 0, 4)) {
+                    if (substr($location['id'], 0, 4) != substr($options['region'], 0, 4)) {  // to figure out region, look at first 4 letters of ID.
                         unset($data[$location_id]);
 
                         continue;
                     }
                 }
                 if (isset($options['province']) && $options['province']) {
-                    // to figure out country, look at first 5 letters of ID.
-                    if (substr($location['id'], 0, 5) != substr($options['province'], 0, 5)) {
+                    if (substr($location['id'], 0, 5) != substr($options['province'], 0, 5)) { // to figure out province, look at first 5 letters of ID.
                         unset($data[$location_id]);
 
                         continue;
