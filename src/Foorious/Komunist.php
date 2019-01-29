@@ -420,7 +420,6 @@ class Komunist
             throw new \Exception('unsupported output type');
         }
 
-        $istat_data = self::_getIstatData();
         $locations = [];
 
         if (!$location_type) {
