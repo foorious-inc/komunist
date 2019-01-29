@@ -411,6 +411,17 @@ class Komunist
         return $locations;
     }
 
+    public static function getLocationById($location_id, $location_type='') {
+        $locations = self::getLocations($location_type, [], self::RETURN_TYPE_ARRAY);
+        foreach ($locations as $location) {
+            if ($location['id'] == $location_id) {
+                return $location;
+            }
+        }
+
+        return false;
+    }
+
     public static function getCityByPostcode($postcode, $return_type) {
         throw new \Exception('actually, a single postcode can span multiple cities, this method doesn\'t make sense');
     }
