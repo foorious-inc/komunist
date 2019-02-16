@@ -12,7 +12,7 @@ class Komunist
     const LOCATION_TYPE_PROVINCE = 'province';
     const LOCATION_TYPE_REGION = 'region';
 
-    private static $_provincesByNUTSCode = []; // all provinces, organized by license plate
+    private static $_provincesByNUTSCode = []; // all provinces, organized by NUTS code
     private static $_cities = []; // all cities
     private static $_citiesByCadCode = []; // all cities, organized by postcode
     private static $_postcodes = []; // all postcodes, organized by cad codes
@@ -44,7 +44,7 @@ class Komunist
                 self::$_postcodes[$city['codiceCatastale']] = $city['cap'];
             }
 
-            // index provinces by license_place_code
+            // index provinces by NUTS code
             if (empty(self::$_provincesByNUTSCode)) {
                 $provinces = self::_getLocationData(self::LOCATION_TYPE_PROVINCE);
 
@@ -152,7 +152,7 @@ class Komunist
 
                     'id' => $location_id,
                     'name' => $fields[5] . ($fields[6] ? '/' . $fields[6] : ''),
-                    'initials' => $fields[13],
+                    'iso_code' => $fields[13],
 
                     'nuts3_2010_code' => $fields[22],
 
@@ -174,7 +174,6 @@ class Komunist
                 'cad_code' => $fields[18],
 
                 'population' => $population,
-                'is_province' => $is_province,
 
                 'region' => [
                     'id' => $fields[21],
@@ -367,7 +366,7 @@ class Komunist
                         $city_data['province'] = [
                             'id' => $province_data['id'],
                             'name' => $province_data['name'],
-                            'license_plate_code' => $province_data['license_plate_code']
+                            'iso_code' => $province_data['iso_code']
                         ];
                         $data[] = $city_data;
                     }
