@@ -363,11 +363,7 @@ class Komunist
                             $city_data['postcodes'] = [];
                         }
                         $province_data = self::_getProvinceData($city_data);
-                        $city_data['province'] = [
-                            'id' => $province_data['id'],
-                            'name' => $province_data['name'],
-                            'iso_code' => $province_data['iso_code']
-                        ];
+                        $city_data['province'] = $province_data;
                         $data[] = $city_data;
                     }
                 }
