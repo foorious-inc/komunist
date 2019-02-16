@@ -143,8 +143,30 @@ class Komunist
 
             $is_province = (bool) $fields[12];
             $population = (int) str_replace(',', '', $fields[19]);
+
+            if ($is_province) {
+                // add province as separate entry
+                $location_id = $fields[22];
+                $istat_data[$location_id] = [
+                    'type' => self::LOCATION_TYPE_PROVINCE,
+
+                    'id' => $location_id,
+                    'name' => $fields[5] . ($fields[6] ? '/' . $fields[6] : ''),
+
+                    'nuts3_2010_code' => $fields[22],
+                    'license_plate_code' =>$fields[13],
+
+                    'region' => [
+                        'id' => $fields[21],
+                        'name' => $fields[9]
+                    ]
+                ];
+            }
+
             $location_id = $fields[22] . $fields[18];
             $istat_data[$location_id] = [
+                'type' => self::LOCATION_TYPE_CITY,
+
                 'id' => $location_id,
                 'name' => $fields[5] . ($fields[6] ? '/' . $fields[6] : ''),
 
@@ -329,32 +351,30 @@ class Komunist
                 break;
             case self::LOCATION_TYPE_PROVINCE:
                 foreach ($istat_data as $city_data) {
-                    if ($city_data['is_province']) {
-                        $city_data['type'] = self::LOCATION_TYPE_PROVINCE;
-                        $city_data['postcodes'] = self::$_postcodes[$city_data['cad_code']];
-                        $city_data['province'] = $city_data;
+                    if ($city_data['type'] == self::LOCATION_TYPE_PROVINCE) {
                         $data[] = $city_data;
                     }
                 }
                 break;
             case self::LOCATION_TYPE_CITY:
                 foreach ($istat_data as $city_data) {
-                    $city_data['type'] = self::LOCATION_TYPE_CITY;
-                    if (!empty(self::$_postcodes[$city_data['cad_code']])) {
-                        $city_data['postcodes'] = self::$_postcodes[$city_data['cad_code']];
-                    } else {
-                        $city_data['postcodes'] = [];
+                    if ($city_data['type'] == self::LOCATION_TYPE_CITY) {
+                        if (!empty(self::$_postcodes[$city_data['cad_code']])) {
+                            $city_data['postcodes'] = self::$_postcodes[$city_data['cad_code']];
+                        } else {
+                            $city_data['postcodes'] = [];
+                        }
+                        if (!$city_data['is_province']) {
+                            $province_data = self::_getProvinceData($city_data);
+                            $city_data['province'] = [
+                                'id' => $province_data['id'],
+                                'name' => $province_data['name']
+                            ];
+                        } else {
+                            $city_data['province'] = $city_data;
+                        }
+                        $data[] = $city_data;
                     }
-                    if (!$city_data['is_province']) {
-                        $province_data = self::_getProvinceData($city_data);
-                        $city_data['province'] = [
-                            'id' => $province_data['id'],
-                            'name' => $province_data['name']
-                        ];
-                    } else {
-                        $city_data['province'] = $city_data;
-                    }
-                    $data[] = $city_data;
                 }
                 break;
             default:
@@ -463,4 +483,3 @@ class Komunist
         return $city;
     }
 }
-?>
