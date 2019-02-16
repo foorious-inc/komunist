@@ -1,11 +1,11 @@
 {
     "name": "foorious-inc/komunist",
     "description": "Utils/API for Italian comuni, provinces, and regions",
-	"version": "0.4.1",
+	"version": "0.5.0",
     "license": "MIT",
     "authors": [
         {
-            "name": "Niccolò Brogi",
+            "name": "Niccolo Brogi",
             "email": "me@nbrogi.com"
         }
     ],
