@@ -152,9 +152,9 @@ class Komunist
 
                     'id' => $location_id,
                     'name' => $fields[5] . ($fields[6] ? '/' . $fields[6] : ''),
+                    'initials' => $fields[13],
 
                     'nuts3_2010_code' => $fields[22],
-                    'license_plate_code' =>$fields[13],
 
                     'region' => [
                         'id' => $fields[21],
@@ -172,7 +172,6 @@ class Komunist
 
                 'nuts3_2010_code' => $fields[22],
                 'cad_code' => $fields[18],
-                'license_plate_code' =>$fields[13],
 
                 'population' => $population,
                 'is_province' => $is_province,
