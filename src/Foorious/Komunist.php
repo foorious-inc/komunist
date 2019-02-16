@@ -367,7 +367,8 @@ class Komunist
                         $province_data = self::_getProvinceData($city_data);
                         $city_data['province'] = [
                             'id' => $province_data['id'],
-                            'name' => $province_data['name']
+                            'name' => $province_data['name'],
+                            'license_plate_code' => $province_data['license_plate_code']
                         ];
                         $data[] = $city_data;
                     }
