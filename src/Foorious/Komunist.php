@@ -364,15 +364,11 @@ class Komunist
                         } else {
                             $city_data['postcodes'] = [];
                         }
-                        if (!$city_data['is_province']) {
-                            $province_data = self::_getProvinceData($city_data);
-                            $city_data['province'] = [
-                                'id' => $province_data['id'],
-                                'name' => $province_data['name']
-                            ];
-                        } else {
-                            $city_data['province'] = $city_data;
-                        }
+                        $province_data = self::_getProvinceData($city_data);
+                        $city_data['province'] = [
+                            'id' => $province_data['id'],
+                            'name' => $province_data['name']
+                        ];
                         $data[] = $city_data;
                     }
                 }
