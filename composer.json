@@ -1,7 +1,7 @@
 {
     "name": "foorious-inc/komunist",
     "description": "Utils/API for Italian comuni, provinces, and regions",
-	"version": "0.6.0",
+	"version": "0.6.1",
     "license": "MIT",
     "authors": [
         {
