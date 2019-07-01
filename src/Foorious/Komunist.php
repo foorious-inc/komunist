@@ -194,7 +194,7 @@ class Komunist
 
             if ($is_province) {
                 // add province as separate entry
-                $location_id = $fields[self::ISTAT_COL_NUTS3_2010_INDEX];
+                $location_id = trim($fields[self::ISTAT_COL_NUTS3_2010_INDEX]);
                 $istat_data[$location_id] = [
                     'type' => self::LOCATION_TYPE_PROVINCE,
 
@@ -202,7 +202,7 @@ class Komunist
                     'name' => $fields[self::ISTAT_COL_CITY_NAME_IT_INDEX] . ($fields[self::ISTAT_COL_CITY_NAME_ETC_INDEX] ? '/' . $fields[self::ISTAT_COL_CITY_NAME_ETC_INDEX] : ''),
                     'iso_code' => $fields[self::ISTAT_COL_IS_PROV_ISO_CODE],
 
-                    'nuts3_2010_code' => $fields[self::ISTAT_COL_NUTS3_2010_INDEX],
+                    'nuts3_2010_code' => trim($fields[self::ISTAT_COL_NUTS3_2010_INDEX]),
 
                     'region' => [
                         'id' => $fields[21],
@@ -211,14 +211,14 @@ class Komunist
                 ];
             }
 
-            $location_id = $fields[self::ISTAT_COL_NUTS3_2010_INDEX] . $fields[self::ISTAT_COL_CAD_CODE_INDEX];
+            $location_id = trim($fields[self::ISTAT_COL_NUTS3_2010_INDEX]) . $fields[self::ISTAT_COL_CAD_CODE_INDEX];
             $istat_data[$location_id] = [
                 'type' => self::LOCATION_TYPE_CITY,
 
                 'id' => $location_id,
                 'name' => $fields[self::ISTAT_COL_CITY_NAME_IT_INDEX] . ($fields[self::ISTAT_COL_CITY_NAME_ETC_INDEX] ? '/' . $fields[self::ISTAT_COL_CITY_NAME_ETC_INDEX] : ''),
 
-                'nuts3_2010_code' => $fields[self::ISTAT_COL_NUTS3_2010_INDEX],
+                'nuts3_2010_code' => trim($fields[self::ISTAT_COL_NUTS3_2010_INDEX]),
                 'cad_code' => $fields[self::ISTAT_COL_CAD_CODE_INDEX],
 
                 'population' => $population,
@@ -424,6 +424,7 @@ class Komunist
         $data_tmp = [];
         foreach ($data as $k=>$v) {
             if (!$data[$k]['id']) {
+                var_dump($data[$k]);
                 throw new \Exception('location does not have ID');
             }
 
