@@ -3,8 +3,8 @@ namespace Foorious;
 
 class Komunist
 {
-    const ISTAT_DATA_FILE = __DIR__ . '/../../data/cities.csv';
-    const COMUNIJSON_DATA_FILE = __DIR__ . '/../../data/comuni-json-2018-03-31/comuni.json';
+    const ISTAT_DATA_FILE = __DIR__ . '/../../data/Elenco-comuni-italiani_2019-05-15.csv';
+    const COMUNIJSON_DATA_FILE = __DIR__ . '/../../data/comuni-json_2019-05-15.json';
 
     const RETURN_TYPE_ARRAY = 'array';
 
