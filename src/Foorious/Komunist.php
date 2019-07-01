@@ -12,6 +12,15 @@ class Komunist
     const LOCATION_TYPE_PROVINCE = 'province';
     const LOCATION_TYPE_REGION = 'region';
 
+    const ISTAT_COL_CITY_NAME_IT_INDEX =       6;
+    const ISTAT_COL_CITY_NAME_ETC_INDEX =      7;
+    const ISTAT_COL_REGION_NAME_INDEX =        10;
+    const ISTAT_COL_IS_PROV_FLAG_INDEX =       12;
+    const ISTAT_COL_IS_PROV_ISO_CODE =         13;
+    const ISTAT_COL_CAD_CODE_INDEX =           18;
+    const ISTAT_COL_POPULATION_INDEX =         19;
+    const ISTAT_COL_NUTS3_2010_INDEX =         22;
+
     private static $_provincesByNUTSCode = []; // all provinces, organized by NUTS code
     private static $_cities = []; // all cities
     private static $_citiesByCadCode = []; // all cities, organized by postcode
@@ -84,7 +93,46 @@ class Komunist
 
         ///////////////////////////////// add Istat data to cache /////////////////////////////////
         /*
-        Fields we're currently interested in:
+        Fields we're currently interested in (2019):
+        ---
+        6 Denominazione in italiano
+        7 Denominazione altra lingua
+        10 Denominazione regione
+        12 Flag Comune capoluogo di provincia/città metropolitana/libero consorzio
+        13 Sigla automobilistica
+        18 Codice Catastale del comune
+        19 Popolazione legale 2011 (09/10/2011)
+        22 NUTS3
+
+        Everything (2019):
+        ---
+        0 Codice Regione
+        1 Codice dell'Unità territoriale sovracomunale (valida a fini statistici)
+        2 Codice Provincia (Storico)(1)
+        3 Progressivo del Comune (2)
+        4 Codice Comune formato alfanumerico
+        5 Denominazione (Italiana e straniera)
+        6 Denominazione in italiano
+        7 Denominazione altra lingua
+        8 Codice Ripartizione Geografica
+        9 Ripartizione geografica
+        10 Denominazione regione
+        11 "Denominazione dell'Unità territoriale sovracomunale (valida a fini statistici)"
+        12 Flag Comune capoluogo di provincia/città metropolitana/libero consorzio
+        13 Sigla automobilistica
+        14 Codice Comune formato numerico
+        15 Codice Comune numerico con 110 province (dal 2010 al 2016)
+        16 Codice Comune numerico con 107 province (dal 2006 al 2009)
+        17 Codice Comune numerico con 103 province (dal 1995 al 2005)
+        18 Codice Catastale del comune
+        19 Popolazione legale 2011 (09/10/2011)
+        20 NUTS1
+        21 NUTS2(3)
+        22 NUTS3
+        */
+
+        /*
+        Fields we're currently interested in (2018):
         ---
         5 Denominazione in italiano
         6 Denominazione in tedesco
@@ -94,7 +142,7 @@ class Komunist
         19 Popolazione legale 2011 (09/10/2011)
         22 Codice NUTS3 2010
 
-        Everything:
+        Everything (2018):
         ---
         0 Codice Regione
         1 Codice Città Metropolitana
@@ -141,43 +189,43 @@ class Komunist
 
             $fields = explode(';', $line);
 
-            $is_province = (bool) $fields[12];
-            $population = (int) str_replace(',', '', $fields[19]);
+            $is_province = (bool) $fields[self::ISTAT_COL_IS_PROV_FLAG_INDEX];
+            $population = (int) str_replace(',', '', $fields[self::ISTAT_COL_POPULATION_INDEX]);
 
             if ($is_province) {
                 // add province as separate entry
-                $location_id = $fields[22];
+                $location_id = $fields[self::ISTAT_COL_NUTS3_2010_INDEX];
                 $istat_data[$location_id] = [
                     'type' => self::LOCATION_TYPE_PROVINCE,
 
                     'id' => $location_id,
-                    'name' => $fields[5] . ($fields[6] ? '/' . $fields[6] : ''),
-                    'iso_code' => $fields[13],
+                    'name' => $fields[self::ISTAT_COL_CITY_NAME_IT_INDEX] . ($fields[self::ISTAT_COL_CITY_NAME_ETC_INDEX] ? '/' . $fields[self::ISTAT_COL_CITY_NAME_ETC_INDEX] : ''),
+                    'iso_code' => $fields[self::ISTAT_COL_IS_PROV_ISO_CODE],
 
-                    'nuts3_2010_code' => $fields[22],
+                    'nuts3_2010_code' => $fields[self::ISTAT_COL_NUTS3_2010_INDEX],
 
                     'region' => [
                         'id' => $fields[21],
-                        'name' => $fields[9]
+                        'name' => $fields[self::ISTAT_COL_REGION_NAME_INDEX]
                     ]
                 ];
             }
 
-            $location_id = $fields[22] . $fields[18];
+            $location_id = $fields[self::ISTAT_COL_NUTS3_2010_INDEX] . $fields[self::ISTAT_COL_CAD_CODE_INDEX];
             $istat_data[$location_id] = [
                 'type' => self::LOCATION_TYPE_CITY,
 
                 'id' => $location_id,
-                'name' => $fields[5] . ($fields[6] ? '/' . $fields[6] : ''),
+                'name' => $fields[self::ISTAT_COL_CITY_NAME_IT_INDEX] . ($fields[self::ISTAT_COL_CITY_NAME_ETC_INDEX] ? '/' . $fields[self::ISTAT_COL_CITY_NAME_ETC_INDEX] : ''),
 
-                'nuts3_2010_code' => $fields[22],
-                'cad_code' => $fields[18],
+                'nuts3_2010_code' => $fields[self::ISTAT_COL_NUTS3_2010_INDEX],
+                'cad_code' => $fields[self::ISTAT_COL_CAD_CODE_INDEX],
 
                 'population' => $population,
 
                 'region' => [
                     'id' => $fields[21],
-                    'name' => $fields[9]
+                    'name' => $fields[self::ISTAT_COL_REGION_NAME_INDEX]
                 ]
             ];
         }
@@ -376,7 +424,7 @@ class Komunist
         $data_tmp = [];
         foreach ($data as $k=>$v) {
             if (!$data[$k]['id']) {
-                throw new Exception('location does not have ID');
+                throw new \Exception('location does not have ID');
             }
 
             $data_tmp[$data[$k]['id']] = $v;
